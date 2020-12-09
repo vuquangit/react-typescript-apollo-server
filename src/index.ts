@@ -10,7 +10,8 @@ export type Context = { todosRepo: TodoRepo }
 const server = new ApolloServer({
   context: () => ({ todosRepo } as Context),
   typeDefs,
-  resolvers
+  resolvers,
+  cors: true
 });
 
 server.listen().then(({ url }) => {

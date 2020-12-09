@@ -1,17 +1,31 @@
-
-import { ApolloServer } from 'apollo-server'
-import { typeDefs } from './schema'
-import { resolvers } from './resolvers'
+import { ApolloServer } from 'apollo-server';
+import { typeDefs } from './schema';
+import { resolvers } from './resolvers';
 import { todosRepo } from './modules/todos/repos';
 import { TodoRepo } from './modules/todos/repos/todoRepo';
 
-export type Context = { todosRepo: TodoRepo }
+export type Context = { todosRepo: TodoRepo };
 
 const server = new ApolloServer({
   context: () => ({ todosRepo } as Context),
   typeDefs,
   resolvers,
-  cors: true
+  cors: {
+    credentials: true,
+    origin: (origin, callback) => {
+      const whitelist = [
+        'http://localhost:3000',
+        'https://react-typescript-saga.vuquangit.vercel.app',
+        'https://react-typescript.vercel.app',
+      ];
+
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+  },
 });
 
 server.listen().then(({ url }) => {

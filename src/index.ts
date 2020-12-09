@@ -1,8 +1,9 @@
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer } from 'apollo-server-express';
 import { typeDefs } from './schema';
 import { resolvers } from './resolvers';
 import { todosRepo } from './modules/todos/repos';
 import { TodoRepo } from './modules/todos/repos/todoRepo';
+const express = require('express');
 
 export type Context = { todosRepo: TodoRepo };
 
@@ -10,33 +11,18 @@ const server = new ApolloServer({
   context: () => ({ todosRepo } as Context),
   typeDefs,
   resolvers,
-  cors: false
-  // cors: {
-  //   credentials: true,
-  //   origin: (origin, callback) => {
-  //     const whitelist = [
-  //       'http://localhost:3000',
-  //       'http://localhost:4000',
-  //       'https://react-typescript-saga.vuquangit.vercel.app',
-  //       'https://react-typescript.vercel.app',
-  //     ];
-
-  //     if (whitelist.indexOf(origin) !== -1) {
-  //       callback(null, true);
-  //     } else {
-  //       callback(new Error('Not allowed by CORS'));
-  //     }
-  //   },
-  // },
 });
 
-server.listen(process.env.GRAPHQL_PORT || 4000).then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`);
-});
+const app = express();
+server.applyMiddleware({ app });
+
+app.listen({ port: process.env.GRAPHQL_PORT || 4000 }, () =>
+  console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
+);
 
 if ((module as any).hot) {
   (module as any).hot.accept();
   (module as any).hot.dispose(() => {
-    console.log("Module disposed");
+    console.log('Module disposed');
   });
 }

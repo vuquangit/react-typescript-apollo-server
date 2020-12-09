@@ -10,11 +10,13 @@ const server = new ApolloServer({
   context: () => ({ todosRepo } as Context),
   typeDefs,
   resolvers,
+  cors: false
   // cors: {
   //   credentials: true,
   //   origin: (origin, callback) => {
   //     const whitelist = [
   //       'http://localhost:3000',
+  //       'http://localhost:4000',
   //       'https://react-typescript-saga.vuquangit.vercel.app',
   //       'https://react-typescript.vercel.app',
   //     ];
@@ -28,7 +30,7 @@ const server = new ApolloServer({
   // },
 });
 
-server.listen().then(({ url }) => {
+server.listen(process.env.GRAPHQL_PORT || 4000).then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`);
 });
 
